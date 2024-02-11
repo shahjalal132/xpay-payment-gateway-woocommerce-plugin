@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Plugin Name:       Custom Payment Gateway
+ * Plugin Name:       Xpay Payment Gateway
  * Plugin URI:        #
- * Description:       Custom Payment Gateway
+ * Description:       Xpay Payment Gateway
  * Version:           1.0.0
  * Requires at least: 5.2
  * Requires PHP:      7.2
@@ -47,6 +47,16 @@ function xpay_payment_gateway_init() {
                 // Load the settings.
                 $this->init_settings();
 
+                $this->title           = $this->get_option( 'woocommerce_xpay_title' );
+                $this->description     = $this->get_option( 'woocommerce_xpay_description' );
+                $this->enabled         = $this->get_option( 'woocommerce_xpay_enabled' );
+                $this->testmode        = 'yes' === $this->get_option( 'woocommerce_xpay_testmode' );
+                $this->private_key     = $this->testmode ? $this->get_option( 'woocommerce_xpay_test_private_key' ) : $this->get_option( 'woocommerce_xpay_private_key' );
+                $this->publishable_key = $this->testmode ? $this->get_option( 'woocommerce_xpay_test_publishable_key' ) : $this->get_option( 'woocommerce_xpay_publishable_key' );
+
+                // This action hook saves the settings
+                add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+
             }
 
             public function init_form_fields() {
@@ -74,10 +84,10 @@ function xpay_payment_gateway_init() {
                     ),
                     'testmode'             => array(
                         'title'       => __( 'Test mode', 'xpay' ),
-                        'label'       => __( 'Enable Test Mode', 'xpay' ),
+                        'label'       => __( 'Test Mode', 'xpay' ),
                         'type'        => 'checkbox',
                         'description' => __( 'Place the payment gateway in test mode using test API keys.', 'xpay' ),
-                        'default'     => 'yes',
+                        'default'     => 'no',
                         'desc_tip'    => true,
                     ),
                     'test_publishable_key' => array(
