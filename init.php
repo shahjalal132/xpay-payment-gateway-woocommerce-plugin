@@ -80,7 +80,7 @@ function xpay_payment_gateway_init() {
                         'title'       => __( 'Description', 'xpay' ),
                         'type'        => 'textarea',
                         'description' => __( 'This controls the description which the user sees during checkout.', 'xpay' ),
-                        'default'     => __( 'Pay with your credit card via our super-cool payment gateway.', 'xpay' ),
+                        'default'     => '',
                     ),
                     'testmode'             => array(
                         'title'       => __( 'Test mode', 'xpay' ),
