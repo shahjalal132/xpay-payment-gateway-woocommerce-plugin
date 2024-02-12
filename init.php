@@ -13,40 +13,74 @@
  * Text Domain:       xpay
  * Domain Path:       /languages
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Update URI:        https://example.com/my-plugin/
  */
 
+/**
+ * Ensure that the WordPress environment is loaded and ABSPATH is defined,
+ * or exit with a message indicating that direct access is not allowed.
+ */
 defined( 'ABSPATH' ) || exit( 'Direct Access Not Allowed' );
 
+// Define plugin path
+if ( !defined( 'XPAY_PLUGIN_PATH' ) ) {
+    define( 'XPAY_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+}
+
+// Define plugin url
+if ( !defined( 'XPAY_PLUGIN_URI' ) ) {
+    define( 'XPAY_PLUGIN_URI', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+}
+
+/**
+ * Load the plugin textdomain for localization.
+ */
+add_action( 'plugins_loaded', 'xpay_load_textdomain' );
+function xpay_load_textdomain() {
+    load_plugin_textdomain( 'xpay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+}
+
+/**
+ * Check if WooCommerce plugin is active, if not, stop further execution.
+ */
 if ( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
     return;
 }
 
+/**
+ * Initialize the Xpay payment gateway.
+ */
 add_action( 'plugins_loaded', 'xpay_payment_gateway_init', 11 );
 function xpay_payment_gateway_init() {
 
     if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
+        /**
+         * Xpay Payment Gateway class extending WooCommerce's payment gateway class.
+         */
         class Xpay_Payment_Gateway extends WC_Payment_Gateway {
 
+            /**
+             * Constructor function to set up the gateway.
+             */
             public function __construct() {
 
+                // Gateway ID, icon, and method title.
                 $this->id                 = 'xpay';
                 $this->icon               = '';
                 $this->has_fields         = false;
                 $this->method_title       = __( 'Xpay Gateway', 'xpay' );
                 $this->method_description = __( 'Description of Xpay payment gateway', 'xpay' );
 
-                $this->supports = array(
-                    'products',
-                );
+                // Supported features.
+                $this->supports = array( 'products' );
 
-                // Method with all the options fields
+                // Initialize form fields.
                 $this->init_form_fields();
 
                 // Load the settings.
                 $this->init_settings();
 
+                // Get settings values.
                 $this->title           = $this->get_option( 'woocommerce_xpay_title' );
                 $this->description     = $this->get_option( 'woocommerce_xpay_description' );
                 $this->enabled         = $this->get_option( 'woocommerce_xpay_enabled' );
@@ -54,11 +88,14 @@ function xpay_payment_gateway_init() {
                 $this->private_key     = $this->testmode ? $this->get_option( 'woocommerce_xpay_test_private_key' ) : $this->get_option( 'woocommerce_xpay_private_key' );
                 $this->publishable_key = $this->testmode ? $this->get_option( 'woocommerce_xpay_test_publishable_key' ) : $this->get_option( 'woocommerce_xpay_publishable_key' );
 
-                // This action hook saves the settings
+                // Save settings on update.
                 add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 
             }
 
+            /**
+             * Initialize form fields for the gateway settings.
+             */
             public function init_form_fields() {
 
                 $this->form_fields = array(
@@ -115,6 +152,9 @@ function xpay_payment_gateway_init() {
 
 }
 
+/**
+ * Add the Xpay Payment Gateway class to WooCommerce payment gateways.
+ */
 add_filter( 'woocommerce_payment_gateways', 'xpay_payment_gateway_class_add' );
 function xpay_payment_gateway_class_add( $gateways ) {
 
