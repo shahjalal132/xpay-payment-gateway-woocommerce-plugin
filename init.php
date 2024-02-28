@@ -66,7 +66,7 @@ function xpay_payment_gateway_init() {
 
                 // Gateway ID, icon, and method title.
                 $this->id                 = 'xpay';
-                $this->icon               = '';
+                $this->icon               = XPAY_PLUGIN_URI . '/assets/images/atm-card.png';
                 $this->has_fields         = false;
                 $this->method_title       = __( 'Xpay Gateway', 'xpay' );
                 $this->method_description = __( 'Description of Xpay payment gateway', 'xpay' );
@@ -103,8 +103,6 @@ function xpay_payment_gateway_init() {
                         'title'       => __( 'Enable/Disable', 'xpay' ),
                         'label'       => __( 'Enable Xpay', 'xpay' ),
                         'type'        => 'checkbox',
-                        'description' => '',
-                        'default'     => 'no',
                     ),
                     'title'                => array(
                         'title'       => __( 'Title', 'xpay' ),
@@ -118,6 +116,7 @@ function xpay_payment_gateway_init() {
                         'type'        => 'textarea',
                         'description' => __( 'This controls the description which the user sees during checkout.', 'xpay' ),
                         'default'     => '',
+                        'desc_tip'    => true,
                     ),
                     'testmode'             => array(
                         'title'       => __( 'Test mode', 'xpay' ),
@@ -128,16 +127,22 @@ function xpay_payment_gateway_init() {
                         'desc_tip'    => true,
                     ),
                     'test_publishable_key' => array(
-                        'title' => __( 'Test Publishable Key', 'xpay' ),
-                        'type'  => 'text',
+                        'title'       => __( 'Test Publishable Key', 'xpay' ),
+                        'type'        => 'text',
+                        'description' => __( 'Enter your test publishable key here.', 'xpay' ),
+                        'default'     => '',
+                        'desc_tip'    => true,
                     ),
                     'test_private_key'     => array(
                         'title' => __( 'Test Private Key', 'xpay' ),
                         'type'  => 'password',
                     ),
                     'publishable_key'      => array(
-                        'title' => __( 'Live Publishable Key', 'xpay' ),
-                        'type'  => 'text',
+                        'title'       => __( 'Live Publishable Key', 'xpay' ),
+                        'type'        => 'text',
+                        'description' => __( 'Enter your live publishable key here.', 'xpay' ),
+                        'default'     => '',
+                        'desc_tip'    => true,
                     ),
                     'private_key'          => array(
                         'title' => __( 'Live Private Key', 'xpay' ),
@@ -157,7 +162,6 @@ function xpay_payment_gateway_init() {
  */
 add_filter( 'woocommerce_payment_gateways', 'xpay_payment_gateway_class_add' );
 function xpay_payment_gateway_class_add( $gateways ) {
-
     $gateways[] = 'Xpay_Payment_Gateway';
     return $gateways;
 }
